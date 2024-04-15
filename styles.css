@@ -1,0 +1,155 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Oxygen:wght@300;400;700&display=swap');
+
+.container{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.TitleText{
+    color: #29435C;
+    font-family: "Archivo Black", sans-serif;
+    font-weight: 300;
+    font-style: normal;
+    font-size: 50px;
+}
+
+.titleGameDiv{
+    background-color: #152A38;
+    width: 250px;
+    height: 65px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    margin: 15px;
+    border-radius: 20px;
+}
+
+.Buttom{
+    background-color: #29435C;
+    color: rgb(255, 255, 255);
+    border-radius: 10px;
+    height: 40px;
+    width: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 10px;
+    font-size: 30px;
+    cursor: pointer;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+}
+
+.header1{
+    min-width: 400px;
+    height: 75px;
+    display: flex;
+    align-items: center;
+    justify-content:center;
+    flex-direction: row;
+    margin: 10px;
+    cursor: default;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+    
+.formulario {
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Centra verticalmente */
+    align-items: center; /* Centra horizontalmente */
+    max-width: 400px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.tablero1{
+    min-width: 100px;
+    min-height: 100px;
+    padding: 50px;
+    background-color: #152A38;
+    border: 1px solid transparent;
+}
+
+.tablero2{
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Centra verticalmente */
+    align-items: center; /* Centra horizontalmente */
+    max-width: 400px;
+    margin: 10px auto;
+    padding: 20px;
+    background-color: #152A38;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.tablero3{
+    min-width: 100px;
+    min-height: 100px;
+    padding: 50px;
+    background-color: #152A38;
+    border: 1px solid transparent;
+}
+
+.tablero-container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Centra verticalmente */
+    align-items: center; /* Centra horizontalmente */
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.fila{
+    display: flex;
+    flex-direction: row;
+    justify-content: center; /* Centra verticalmente */
+    align-items: center; /* Centra horizontalmente */
+    margin: 0%;
+}
+
+.celda{
+    width: 30px;
+    height: 30px;
+    background-color: #29435C;
+    border: 2px solid #152A38; /* Añadí solid para definir el tipo de borde */
+    border-radius: 4px;
+    margin: 0%;
+}
+
+input[type="text"] {
+    width: calc(100% - 10px);
+    padding: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+input[type="text"]:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}

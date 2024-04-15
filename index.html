@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>TrafficJam</title>
+        <link rel="stylesheet" type="text/css" href="styles.css">
+    </head>
+
+    <body>
+        <div class="container">
+            <div>
+            <div>
+                <div class="header1">
+                    <div class="TitleText">TrafficJam</div>
+                </div>
+            </div>
+
+            <div class="container">
+                <div class="Buttom" onclick="ClickPlay()"><p>PLAY</p></div>
+            </div>
+            
+            <div class="formulario" id="idFormaulario">
+                <label for="input1">Cantidad de filas:</label>
+                <input type="text" id="input1" name="input1">
+                <label for="input2">Cantidad de Columnas:</label>
+                <input type="text" id="input2" name="input2">
+                <div class="container">
+                    <div class="Buttom" onclick="generarTablero()"><p>GENERAR</p></div>
+                </div>
+            </div>
+            
+            <div id="idTableroContainer" class="tablero-container" style="display: none;">
+                <div id="idTablero1" class="tablero1"></div>
+                <div id="idTablero2" class="tablero2"></div>
+                <div id="idTablero3" class="tablero3"></div>
+            </div>
+           
+        </div>
+
+    </body>
+</html>
+<script src="scriptTrafficJam.js" type="text/javascript"></script> 
