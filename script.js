@@ -1,12 +1,9 @@
 
-
-
 // Variable global para almacenar el tablero (matriz de juego)
 var tablero = [];
-
 var emptyTable = [];
 
-//lista = [[0,1], [0,2], [0,3], [0,4]]
+//posiciones = [[0,1], [0,2], [0,3], [0,4]]
 //direction = 'h' //'v'
 
 // Variables globales para almacenar las coordenadas de la salida
@@ -17,44 +14,73 @@ var indexOut_y = 0;
 var filas = 0;
 var columnas = 0;
 
-var listCarros = [];
+var listCarros = []; //Aqui estaran todos los diccionarios Carro
 
-//class Carro {
-//    constructor(posiciones, orientacion, heuristica, costoInicial, esObjetivo) {
-//        this.posiciones = posiciones || []; 
-//        this.orientacion = orientacion; 
-//        this.heuristica = heuristica; 
-//        this.costoInicial = costoInicial; 
-//        this.costoTotal = costoInicial + heuristica; 
-//        this.esObjetivo = esObjetivo;
-//        this.padre = null; 
-//    }
-//
-//    darPaso(){
-//        if (this.orientacion === 'h'){
-//            for (var i = 0; i < this.posiciones.length; i++){
-//                this.posiciones[i][1] += 1;
-//            }
-//        }else{
-//            for (var i = 0; i < this.posiciones.length; i++){
-//                this.posiciones[i][0] += 1;
-//            }
-//        }
-//    }
-//
-//    toString() {
-//        return `Carro: ${this.posiciones}, orientacion: ${this.orientacion}, esObjetivo: ${this.esObjetivo}`;
-//    
-//    }
-//}
+//Ejemplo Coordenadas: [0,1]
+function buscarCarroByCoords(Coordenadas){
+    for (var i = 0; i < listCarros.length; i++){
+        var carro = listCarros[i];
+        for (var j = 0; j < carro.posiciones.length; j++){
+            var pos = carro['posiciones'][j];
+            if (pos[0] === Coordenadas[0] && pos[1] === Coordenadas[1]){
+                return carro;
+            }
+        }
+    }
+    return -1;
+}
+
+function buscarCarroById(id){
+    for (var i = 0; i < listCarros.length; i++){
+        var carro = listCarros[i];
+        if (carro['id'] === id){
+            return carro;
+        }
+    }
+    return -1;
+}
+
+function moverCarro(Coordenadas){
+
+}
+
 
 function updateCars(){
     tablero = emptyTable;
-
+    for (var i = 0; i < listCarros.length; i++){
+        var carro = listCarros[i];
+        for (var j = 0; j < carro.posiciones.length; j++){
+            var pos = carro['posiciones'][j];
+            if (carro['orientacion'] === 'h'){
+                if(pos === carro['posiciones'][carro['posiciones'].length-1]){
+                    if (carro['esObjetivo']){
+                        tablero[pos[0]][pos[1]] = 'B';
+                    }else{
+                        tablero[pos[0]][pos[1]] = '>';
+                    }
+                }else{
+                    tablero[pos[0]][pos[1]] = '-';
+                }
+                
+            }else{
+                if(pos === carro['posiciones'][carro['posiciones'].length-1]){
+                    if (carro['esObjetivo']){
+                        tablero[pos[0]][pos[1]] = 'B';
+                    }else{
+                        tablero[pos[0]][pos[1]] = 'v';
+                    }
+                }else{
+                    tablero[pos[0]][pos[1]] = '|';
+                }
+            }
+        }
+    }
+    console.log(tablero);
 }
 
 // Función para actualizar la interfaz gráfica basada en el tablero
 function initGUI() {
+    var idCar = 1
     for (var i = 0; i < tablero.length; i++) {
         for (var j = 0; j < tablero[i].length; j++) {
             var celda = document.getElementById(`C${i}${j}`);
@@ -84,8 +110,10 @@ function initGUI() {
                     posCelda.classList.add(cellClass);
                 }
                 j = x;
-                //console.log(posCar);
                 
+                //console.log(posCar);
+                dicCarro['id'] = idCar;
+                idCar += 1;
                 dicCarro['posiciones'] = posCar;
                 dicCarro['orientacion'] = 'h';
                 dicCarro['heuristica'] = 0;
@@ -122,13 +150,15 @@ function initGUI() {
                 }
                 //i = y;
                 if (posCelda.length !== 0 && validarCarro(posCar[0]) === true){
-                    //console.log(posCar);
-                    dicCarro['posiciones'] = posCar;
-                    dicCarro['orientacion'] = 'v';
+                    dicCarro['id'] = idCar;
+                    idCar += 1;
+                    //Ej: posCar = [[0,1], [0,2], [0,3], [0,4]]
+                    dicCarro['posiciones'] = posCar;  //Se guardan las posiciones de todas las casillas que ocupa el carro
+                    dicCarro['orientacion'] = 'v';  //Se guarda la orientación del carro
                     dicCarro['heuristica'] = 0;
                     dicCarro['costoInicial'] = 0;
                     dicCarro['costoTotal'] = 0;
-                    dicCarro['esObjetivo'] = isTarget;
+                    dicCarro['esObjetivo'] = isTarget;  //Se guarda si el carro es objetivo
                     dicCarro['padre'] = null;
                     //console.log(dicCarro);
                     listCarros.push(dicCarro);
@@ -138,14 +168,28 @@ function initGUI() {
             }
         }
     }
-    console.log(listCarros);
+    //var celda = document.getElementById(`C${indexOut_y}${indexOut_x}`);
+    //celda.classList.add("exit");
+    //console.log(listCarros);
+    var carroPrueba = buscarCarroByCoords([3,0])
+    console.log(carroPrueba);
+
+    carroPrueba = buscarCarroById(4);
+    console.log(carroPrueba);
+
+    vaciarTablero();
 };
 
-
+/**
+ * 
+ * @param {list} coords 
+ * @returns boolean
+ */
 function validarCarro(coords) {
     if (listCarros.length > 0 && coords !== undefined) {
         for (let carro of listCarros) {
             // Verificar si coords está presente en carro.posiciones
+            var varHeuristica = carro['heuristica'];
             for (let pos of carro.posiciones) {
                 if (pos[0] === coords[0] && pos[1] === coords[1]) {
                     return false; // Se encontró una coincidencia
@@ -159,13 +203,14 @@ function validarCarro(coords) {
 
 
 
-function generarTableroVacio() {
-    for (var i = 0; i < tablero.length; i++) {
+function vaciarTablero() {
+    tablero = [];
+    for (var i = 0; i < filas; i++) {
         var fila = [];
-        for (var j = 0; j < tablero[i].length; j++) {
+        for (var j = 0; j < columnas; j++) {
             fila.push('.');
         }
-        emptyTable.push(fila);
+        tablero.push(fila);
     }
     //console.log(emptyTable);
 };
@@ -203,7 +248,6 @@ function generarTablero() {
 
 
     tableroContainer.appendChild(tableroDOM);
-    generarTableroVacio();
 };
 
 // Función para parsear el tablero y mostrarlo en la página
