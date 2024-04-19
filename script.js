@@ -1,5 +1,5 @@
 
-var carros = [];
+
 
 // Variable global para almacenar el tablero (matriz de juego)
 var tablero = [];
@@ -17,40 +17,44 @@ var indexOut_y = 0;
 var filas = 0;
 var columnas = 0;
 
-class Carro {
-    constructor(posiciones, orientacion, heuristica, costoInicial, esObjetivo) {
-        this.posiciones = posiciones; 
-        this.orientacion = orientacion; 
-        this.heuristica = heuristica; 
-        this.costoInicial = costoInicial; 
-        this.costoTotal = costoInicial + heuristica; 
-        this.esObjetivo = esObjetivo;
-        this.padre = null; 
-    }
+var listCarros = [];
 
-    darPaso(){
-        if (this.orientacion === 'h'){
-            for (var i = 0; i < this.posiciones.length; i++){
-                this.posiciones[i][1] += 1;
-            }
-        }else{
-            for (var i = 0; i < this.posiciones.length; i++){
-                this.posiciones[i][0] += 1;
-            }
-        }
-    }
+//class Carro {
+//    constructor(posiciones, orientacion, heuristica, costoInicial, esObjetivo) {
+//        this.posiciones = posiciones || []; 
+//        this.orientacion = orientacion; 
+//        this.heuristica = heuristica; 
+//        this.costoInicial = costoInicial; 
+//        this.costoTotal = costoInicial + heuristica; 
+//        this.esObjetivo = esObjetivo;
+//        this.padre = null; 
+//    }
+//
+//    darPaso(){
+//        if (this.orientacion === 'h'){
+//            for (var i = 0; i < this.posiciones.length; i++){
+//                this.posiciones[i][1] += 1;
+//            }
+//        }else{
+//            for (var i = 0; i < this.posiciones.length; i++){
+//                this.posiciones[i][0] += 1;
+//            }
+//        }
+//    }
+//
+//    toString() {
+//        return `Carro: ${this.posiciones}, orientacion: ${this.orientacion}, esObjetivo: ${this.esObjetivo}`;
+//    
+//    }
+//}
 
-    toString() {
-        return `Carro: ${this.posiciones}, orientacion: ${this.orientacion}, esObjetivo: ${this.esObjetivo}`;
-    
-    }
+function updateCars(){
+    tablero = emptyTable;
+
 }
 
-
-
 // Función para actualizar la interfaz gráfica basada en el tablero
-function updateGUI() {
-    var posLista = [];
+function initGUI() {
     for (var i = 0; i < tablero.length; i++) {
         for (var j = 0; j < tablero[i].length; j++) {
             var celda = document.getElementById(`C${i}${j}`);
@@ -58,6 +62,7 @@ function updateGUI() {
             var cellClass = '';
             var posCar = [];
             var isTarget = false;
+            const dicCarro = {}; // Diccionario para guardar los datos del carro
             if (contenido === '-'){
                 cellClass = 'car';
                 // Buscar hacia la derecha hasta encontrar la flecha o el objetivo
@@ -79,9 +84,17 @@ function updateGUI() {
                     posCelda.classList.add(cellClass);
                 }
                 j = x;
-                const carro = new Carro(posCar, 'h', 0, 0, isTarget);
-                console.log(carro.toString());
-                carros.push(carro);
+                //console.log(posCar);
+                
+                dicCarro['posiciones'] = posCar;
+                dicCarro['orientacion'] = 'h';
+                dicCarro['heuristica'] = 0;
+                dicCarro['costoInicial'] = 0;
+                dicCarro['costoTotal'] = 0;
+                dicCarro['esObjetivo'] = isTarget;
+                dicCarro['padre'] = null;
+                //console.log(dicCarro);
+                listCarros.push(dicCarro);
             }
             //Busca si hay un carro vertical y lo marca como tal
             else if (contenido === '|'){
@@ -101,33 +114,50 @@ function updateGUI() {
                             break; // Terminar si encontramos el objetivo
                         } 
                         posCar.push([y, j]); // Guardar coordenadas del carro
-                        posLista.push([y, j]);
                     }
                 for (var pos in posCar) {
+                    //console.log(posCar);
                     var posCelda = document.getElementById(`C${posCar[pos][0]}${posCar[pos][1]}`);
                     posCelda.classList.add(cellClass);
                 }
                 //i = y;
+                if (posCelda.length !== 0 && validarCarro(posCar[0]) === true){
+                    //console.log(posCar);
+                    dicCarro['posiciones'] = posCar;
+                    dicCarro['orientacion'] = 'v';
+                    dicCarro['heuristica'] = 0;
+                    dicCarro['costoInicial'] = 0;
+                    dicCarro['costoTotal'] = 0;
+                    dicCarro['esObjetivo'] = isTarget;
+                    dicCarro['padre'] = null;
+                    //console.log(dicCarro);
+                    listCarros.push(dicCarro);
+                }
                 
-                const carro = new Carro(posCar, 'v', 0, 0, isTarget);
-                console.log(carro.toString());
-                carros.push(carro);
             
             }
         }
     }
+    console.log(listCarros);
 };
 
-function validarCarro(posCar){
-    for (carro in carros) {
-        for (var i = 0; i < posCar.length; i++) {
-            if(posCar[i] in carro.posiciones) {
-                return false
+
+function validarCarro(coords) {
+    if (listCarros.length > 0 && coords !== undefined) {
+        for (let carro of listCarros) {
+            // Verificar si coords está presente en carro.posiciones
+            for (let pos of carro.posiciones) {
+                if (pos[0] === coords[0] && pos[1] === coords[1]) {
+                    return false; // Se encontró una coincidencia
+                }
             }
         }
     }
-    return true;
+    return true; // No se encontraron coincidencias
 }
+
+
+
 
 function generarTableroVacio() {
     for (var i = 0; i < tablero.length; i++) {
@@ -137,7 +167,7 @@ function generarTableroVacio() {
         }
         emptyTable.push(fila);
     }
-    console.log(emptyTable);
+    //console.log(emptyTable);
 };
 
 function generarTablero() {
@@ -195,7 +225,6 @@ function parseBoard() {
     var boardRows = boardInput.split('\n');
     console.log(boardRows);
     boardRows.forEach((row, rowIndex) => {
-        //var rowHTML = "<div class='board-row'>";
         var rowArray = [];
         row.trim().split('').forEach((cell, cellIndex) => {
             if (cell !== ' ') { // Ignorar los espacios en blanco
@@ -244,29 +273,21 @@ function parseBoard() {
                 } else if (cell === '.') {
                     cellClass = 'empty';
                 }
-                //rowHTML += `<div class="cell ${cellClass}" id="cell_${rowIndex}_${cellIndex}" draggable="true" ondragstart="drag(event)"></div>`; // Agregar controlador de eventos de arrastrar
                 rowArray.push(cell);
             }
         });
-        //rowHTML += "</div>";
-        //boardHTML += rowHTML;
+
         tablero.push(rowArray); // Agregar la fila a la matriz del tablero
     });
-    //boardContainer.innerHTML = boardHTML;
-
-    // Marcar la salida en el tablero visualmente
-    //var exitCell = document.querySelector('.board-row:nth-child(' + indexOut_y + ') .cell:nth-child(' + indexOut_x + ')');
-    //if (exitCell) {
-    //    exitCell.classList.add('exit');
-    //}
+    
     filas = tablero.length;
     columnas = tablero[0].length;
     console.log(indexOut_x, indexOut_y)
     console.log("filas: ", filas);
     console.log("columnas: ", columnas);
-    console.log(tablero);
+    //console.log(tablero);
     generarTablero();
-    updateGUI();
+    initGUI();
 };
 
 // Función para permitir que los elementos se puedan arrastrar
