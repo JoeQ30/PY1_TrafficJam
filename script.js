@@ -1,7 +1,6 @@
 
 // Variable global para almacenar el tablero (matriz de juego)
 var tablero = [];
-var emptyTable = [];
 
 //posiciones = [[0,1], [0,2], [0,3], [0,4]]
 //direction = 'h' //'v'
@@ -41,12 +40,25 @@ function buscarCarroById(id){
 }
 
 function moverCarro(Coordenadas){
-
+    var carro = buscarCarroByCoords(Coordenadas);
+    var posicionesCarro = carro['posiciones'];
+    var orientacion = carro['orientacion'];
+    if (orientacion === 'h'){
+        for (var i = 0; i < posicionesCarro.length; i++){
+            var pos = posicionesCarro[i];
+            pos[1] += 1;
+        }
+    }else {
+        for (var i = 0; i < posicionesCarro.length; i++){
+            var pos = posicionesCarro[i];
+            pos[0] += 1;
+        }
+    }
 }
 
-
+//Antes de llamar a esta funcion hay que vaciar e; tablero
 function updateCars(){
-    tablero = emptyTable;
+    vaciarTablero();
     for (var i = 0; i < listCarros.length; i++){
         var carro = listCarros[i];
         for (var j = 0; j < carro.posiciones.length; j++){
@@ -168,16 +180,20 @@ function initGUI() {
             }
         }
     }
+    
     //var celda = document.getElementById(`C${indexOut_y}${indexOut_x}`);
     //celda.classList.add("exit");
-    //console.log(listCarros);
+    console.log(listCarros);
     var carroPrueba = buscarCarroByCoords([3,0])
     console.log(carroPrueba);
+    var posicionesCarro = carroPrueba['posiciones'];
+    //carroPrueba = buscarCarroById(4);
+    //console.log(carroPrueba);
 
-    carroPrueba = buscarCarroById(4);
-    console.log(carroPrueba);
+    //Sumo una casilla hacia abajo a cada coordenada
+    moverCarro([0,0]);
 
-    vaciarTablero();
+    updateCars();
 };
 
 /**
@@ -205,6 +221,7 @@ function validarCarro(coords) {
 
 function vaciarTablero() {
     tablero = [];
+    var emptyTable = []
     for (var i = 0; i < filas; i++) {
         var fila = [];
         for (var j = 0; j < columnas; j++) {
@@ -212,7 +229,7 @@ function vaciarTablero() {
         }
         tablero.push(fila);
     }
-    //console.log(emptyTable);
+    //console.log(tablero);
 };
 
 function generarTablero() {
@@ -326,9 +343,9 @@ function parseBoard() {
     
     filas = tablero.length;
     columnas = tablero[0].length;
-    console.log(indexOut_x, indexOut_y)
-    console.log("filas: ", filas);
-    console.log("columnas: ", columnas);
+    //console.log(indexOut_x, indexOut_y)
+    //console.log("filas: ", filas);
+    //console.log("columnas: ", columnas);
     //console.log(tablero);
     generarTablero();
     initGUI();
