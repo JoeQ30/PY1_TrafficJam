@@ -62,17 +62,24 @@ function moverCarro(Coordenadas){
         if (orientacion === 'h'){
             for (var i = 0; i < posicionesCarro.length; i++){
                 var pos = posicionesCarro[i];
-                pos[1] += 1;
+                if(pos[1] < columnas-1){
+                    pos[1] += 1;
+                }else{
+                    break;
+                }
             }
         }else {
             for (var i = 0; i < posicionesCarro.length; i++){
                 var pos = posicionesCarro[i];
-                pos[0] += 1;
+                if(pos[0] < filas){
+                    pos[0] += 1;
+                }else{
+                    break;
+                }
             }
         }
         //Actualizar la posicion
         updateCars();
-        generarTablero();
         updateGUI();
        
     } else{
@@ -121,6 +128,7 @@ function updateCars(){
  * 
  */
 function updateGUI() {
+    generarTablero();
     for (var i = 0; i < tablero.length; i++) {
         for (var j = 0; j < tablero[i].length; j++) {
             var celda = document.getElementById(`C${i}${j}`);
