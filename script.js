@@ -64,8 +64,6 @@ function moverCarro(Coordenadas){
                 var pos = posicionesCarro[i];
                 if(pos[1] < columnas-1){
                     pos[1] += 1;
-                }else{
-                    break;
                 }
             }
         }else {
@@ -73,8 +71,6 @@ function moverCarro(Coordenadas){
                 var pos = posicionesCarro[i];
                 if(pos[0] < filas){
                     pos[0] += 1;
-                }else{
-                    break;
                 }
             }
         }
@@ -343,7 +339,7 @@ function generarTablero() {
 
         for (var j = 0; j < tablero[i].length; j++) {
             var celda = document.createElement("td");
-            if (i == indexOut_y && j == indexOut_x) {
+            if (i == indexOut_y-1 && j == indexOut_x-1) {
                 celda.classList.add("exit");
             }else{
                 celda.classList.add("celda");

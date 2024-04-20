@@ -107,7 +107,7 @@
     width: 30px;
     height: 30px;
     background-color: #29435C;
-    border: 3px solid #03c0ce; /* Añadí solid para definir el tipo de borde */
+    border: 1px solid #03c0ce; /* Añadí solid para definir el tipo de borde */
     border-radius: 4px;
     margin: 0%;
 }
