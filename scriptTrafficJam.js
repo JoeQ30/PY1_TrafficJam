@@ -48,8 +48,8 @@ function representarTableroMatriz(tablero){
  */
 class Carro {
     constructor(x, y, g, h) {
-        this.x = x;
-        this.y = y;
+        this.x = x; //Posicion x
+        this.y = y; // Posicion Y
         this.g = g; // Costo desde el nodo inicial hasta este nodo
         this.h = h; // Heurística: estimación del costo desde este nodo hasta el nodo objetivo
         this.f = g + h; // Costo total: g + h
