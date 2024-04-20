@@ -16,6 +16,11 @@ var columnas = 0;
 var listCarros = []; //Aqui estaran todos los diccionarios Carro
 
 //Ejemplo Coordenadas: [0,1]
+/**
+ * 
+ * @param {[int, int]} Coordenadas 
+ * @returns carro o -1 en caso de que no haya carro en la posicion
+ */
 function buscarCarroByCoords(Coordenadas){
     for (var i = 0; i < listCarros.length; i++){
         var carro = listCarros[i];
@@ -26,9 +31,14 @@ function buscarCarroByCoords(Coordenadas){
             }
         }
     }
-    return -1;
+    return null;
 }
 
+/**
+ * 
+ * @param {int} id 
+ * @returns carrro  o -1 si no hay carro con el id
+ */
 function buscarCarroById(id){
     for (var i = 0; i < listCarros.length; i++){
         var carro = listCarros[i];
@@ -36,27 +46,44 @@ function buscarCarroById(id){
             return carro;
         }
     }
-    return -1;
+    return null;
 }
 
+/**
+ * 
+ * @param {[int, int]} Coordenadas 
+ */
 function moverCarro(Coordenadas){
+    console.log(Coordenadas);
     var carro = buscarCarroByCoords(Coordenadas);
-    var posicionesCarro = carro['posiciones'];
-    var orientacion = carro['orientacion'];
-    if (orientacion === 'h'){
-        for (var i = 0; i < posicionesCarro.length; i++){
-            var pos = posicionesCarro[i];
-            pos[1] += 1;
+    if (carro != null) {
+        var posicionesCarro = carro['posiciones'];
+        var orientacion = carro['orientacion'];
+        if (orientacion === 'h'){
+            for (var i = 0; i < posicionesCarro.length; i++){
+                var pos = posicionesCarro[i];
+                pos[1] += 1;
+            }
+        }else {
+            for (var i = 0; i < posicionesCarro.length; i++){
+                var pos = posicionesCarro[i];
+                pos[0] += 1;
+            }
         }
-    }else {
-        for (var i = 0; i < posicionesCarro.length; i++){
-            var pos = posicionesCarro[i];
-            pos[0] += 1;
-        }
+        //Actualizar la posicion
+        updateCars();
+        generarTablero();
+        updateGUI();
+       
+    } else{
+        console.log("Error: No hay ningún carro en esta posicion")
     }
 }
 
 //Antes de llamar a esta funcion hay que vaciar e; tablero
+/**
+ * 
+ */
 function updateCars(){
     vaciarTablero();
     for (var i = 0; i < listCarros.length; i++){
@@ -90,7 +117,69 @@ function updateCars(){
     console.log(tablero);
 }
 
+/**
+ * 
+ */
+function updateGUI() {
+    for (var i = 0; i < tablero.length; i++) {
+        for (var j = 0; j < tablero[i].length; j++) {
+            var celda = document.getElementById(`C${i}${j}`);
+            var contenido = tablero[i][j];
+            var cellClass = '';
+            var posCar = [];
+            if (contenido === '-'){
+                cellClass = 'car';
+                // Buscar hacia la derecha hasta encontrar la flecha o el objetivo
+                for (var x = j; x < tablero[i].length; x++) {
+                    if (tablero[i][x] === '>' ) {
+                        cellClass = 'car';
+                        posCar.push([i, x]);
+                        break; // Terminar si encontramos la flecha
+                    } else if (tablero[i][x] === 'B') {
+                        cellClass = 'target'; // Marcar todo el carro objetivo en rojo
+                        posCar.push([i, x]);
+                        break; // Terminar si encontramos el objetivo
+                    }
+                    posCar.push([i, x]); // Guardar coordenadas del carro
+                }
+                for (var pos in posCar) {
+                    var posCelda = document.getElementById(`C${posCar[pos][0]}${posCar[pos][1]}`);
+                    posCelda.classList.add(cellClass);
+                }
+                j = x;
+            }
+            //Busca si hay un carro vertical y lo marca como tal
+            else if (contenido === '|'){
+                cellClass = 'car';
+            
+                // Buscar hacia la derecha hasta encontrar la flecha o el objetivo
+                for (var y = i; y < tablero.length; y++) {
+                        if (tablero[y][j] === 'v' ) {
+                            cellClass = 'car';
+                            posCar.push([y, j]);
+                            break; // Terminar si encontramos la flecha
+                        }
+                        else if (tablero[y][j] === 'B') {
+                            cellClass = 'target'; // Marcar todo el carro objetivo en rojo
+                            posCar.push([y, j]);
+                            break; // Terminar si encontramos el objetivo
+                        } 
+                        posCar.push([y, j]); // Guardar coordenadas del carro
+                    }
+                for (var pos in posCar) {
+                    //console.log(posCar);
+                    var posCelda = document.getElementById(`C${posCar[pos][0]}${posCar[pos][1]}`);
+                    posCelda.classList.add(cellClass);
+                }
+            }
+        }
+    }
+};
+
 // Función para actualizar la interfaz gráfica basada en el tablero
+/**
+ * 
+ */
 function initGUI() {
     var idCar = 1
     for (var i = 0; i < tablero.length; i++) {
@@ -180,21 +269,19 @@ function initGUI() {
             }
         }
     }
-    
-    //var celda = document.getElementById(`C${indexOut_y}${indexOut_x}`);
-    //celda.classList.add("exit");
     console.log(listCarros);
-    var carroPrueba = buscarCarroByCoords([3,0])
-    console.log(carroPrueba);
-    var posicionesCarro = carroPrueba['posiciones'];
+    //var carroPrueba = buscarCarroByCoords([3,0])
+    //console.log(carroPrueba);
+    //var posicionesCarro = carroPrueba['posiciones'];
     //carroPrueba = buscarCarroById(4);
     //console.log(carroPrueba);
 
     //Sumo una casilla hacia abajo a cada coordenada
-    moverCarro([0,0]);
-
-    updateCars();
+    //carroPrueba = buscarCarromoverCarro([0,0]);
+    //carroPrueba = buscarCarro
+    //carroPrueba = buscarCarroupdateCars();
 };
+
 
 /**
  * 
@@ -217,8 +304,6 @@ function validarCarro(coords) {
 }
 
 
-
-
 function vaciarTablero() {
     tablero = [];
     var emptyTable = []
@@ -231,6 +316,7 @@ function vaciarTablero() {
     }
     //console.log(tablero);
 };
+
 
 function generarTablero() {
     var tableroContainer = document.getElementById("board-container");
@@ -256,7 +342,15 @@ function generarTablero() {
             }
             
             celda.id = `C${i}${j}`;
-            celda.textContent = tablero[i][j]; // Mostramos el contenido del tablero en la celda
+            //var coords = [i,j];
+
+            (function(x, y) {
+                celda.addEventListener("click", function() {
+                    moverCarro([x, y]);
+                });
+            })(i, j); // Utiliza una función de cierre para crear un ámbito diferente para cada variable coords
+           
+            //celda.textContent = tablero[i][j]; // Mostramos el contenido del tablero en la celda
             fila.appendChild(celda);
         }
 
