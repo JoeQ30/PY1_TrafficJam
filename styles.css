@@ -103,11 +103,30 @@
     cursor: pointer;
 }
 
+.car_exit {
+    width: 30px;
+    height: 30px;
+    background-color: #b6d626;
+    border: 2px solid #03c0ce; /* Añadí solid para definir el tipo de borde */
+    border-radius: 4px;
+    margin: 0%;
+    cursor: pointer;
+}
+
 .exit{
     width: 30px;
     height: 30px;
     background-color: #29435C;
     border: 1px solid #03c0ce; /* Añadí solid para definir el tipo de borde */
+    border-radius: 4px;
+    margin: 0%;
+}
+
+.target_exit {
+    width: 30px;
+    height: 30px;
+    background-color: #9c1e1e;
+    border: 2px solid #03c0ce; /* Añadí solid para definir el tipo de borde */
     border-radius: 4px;
     margin: 0%;
 }

@@ -23,15 +23,15 @@ var listCarros = []; //Aqui estaran todos los diccionarios Carro
  */
 function buscarCarroByCoords(Coordenadas){
     for (var i = 0; i < listCarros.length; i++){
-        var carro = listCarros[i];
+        var carro = listCarros[i]; //Se asigna el carro posicion i
         for (var j = 0; j < carro.posiciones.length; j++){
-            var pos = carro['posiciones'][j];
+            var pos = carro['posiciones'][j];    // Se obtiene la posicion j de carro i
             if (pos[0] === Coordenadas[0] && pos[1] === Coordenadas[1]){
-                return carro;
+                return carro;   //Si es el carro buscado se retorna dicho carro
             }
         }
     }
-    return null;
+    return null;  //Si no se encuentra el carro se retorna nulo
 }
 
 /**
@@ -268,22 +268,10 @@ function initGUI() {
                     //console.log(dicCarro);
                     listCarros.push(dicCarro);
                 }
-                
-            
             }
         }
     }
     console.log(listCarros);
-    //var carroPrueba = buscarCarroByCoords([3,0])
-    //console.log(carroPrueba);
-    //var posicionesCarro = carroPrueba['posiciones'];
-    //carroPrueba = buscarCarroById(4);
-    //console.log(carroPrueba);
-
-    //Sumo una casilla hacia abajo a cada coordenada
-    //carroPrueba = buscarCarromoverCarro([0,0]);
-    //carroPrueba = buscarCarro
-    //carroPrueba = buscarCarroupdateCars();
 };
 
 
@@ -477,14 +465,14 @@ function calcularHeuristica(nodo, destino) {
 
 /**
  * 
- * @param {Carro} nodoActual 
+ * @param {Carro} carro en la posicion actual
  * @param {Tablero} matriz 
  * @param {Coordenadas x,y} destino 
  * @returns Array de todos los carros adyacentes
  */
 function generarSucesores(carroActual, matriz, destino) {
     const sucesores = [];
-    const movimientos = [[-1, 0], [0, -1], [1, 0], [0, 1]]; // Movimientos posibles: arriba, izquierda, abajo, derecha
+    const movimientos = [[-1, 0], [0, -1], [1, 0], [0, 1]]; // Movimientos posibles: arriba, izquierda, abajo, derecha depende de la variable 
 
     for (const movimiento of movimientos) {
         const fila = carroActual.x + movimiento[0];
@@ -504,7 +492,13 @@ function generarSucesores(carroActual, matriz, destino) {
     return sucesores;
 }
 
-
+/**
+ * 
+ * @param {*} nodoActual 
+ * @param {*} destino posicion de la casilla de destino
+ * @param {*} camino una lista que contiene las posiciones simbolizado el camino
+ * @returns true si encontro la solucion, false sino
+ */
 function esSolucion(nodoActual, destino, camino){
     if (nodoActual.x === destino[0] && nodoActual.y === destino[1]) {
         let nodo = nodoActual;
@@ -514,11 +508,11 @@ function esSolucion(nodoActual, destino, camino){
         }
         return true;
     }
-
+    return false;
 
 }
 /**
- * 
+ * Funcion general del algoritmo de A*
  * @param {Tablero} matriz 
  * @param {Carro objetivo} inicio 
  * @param {Salida} destino 
@@ -528,7 +522,19 @@ function aEstrella(matriz, inicio, destino) {
     const abierto = []; 
     const cerrado = []; // Nodos que ya hemos visitado por cada llamada 
 
-    abierto.push(new Carro(inicio[0], inicio[1], 0, calcularHeuristica({x: inicio[0], y: inicio[1]}, {x: destino[0], y: destino[1]})));
+
+    
+    abierto.push(
+        new Carro(inicio[0], inicio[1], 0, calcularHeuristica({x: inicio[0], y: inicio[1]}, {x: destino[0], y: destino[1]})),
+        dicCarro['posiciones'] = posCar,  //Se guardan las posiciones de todas las casillas que ocupa el carro
+        dicCarro['heuristica'] = calcularHeuristica,
+        dicCarro['costoInicial'] = 0,
+        dicCarro['costoTotal'] = 0,
+        dicCarro['esObjetivo'] = isTarget,  //Se guarda si el carro es objetivo
+        dicCarro['padre'] = null,
+        dicCarro['orientacion'] = 'v',  //Se guarda la orientación del carro
+    
+    );
 
     while (abierto.length > 0) {
         let nodoActual = abierto[0];
