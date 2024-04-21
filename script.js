@@ -17,9 +17,10 @@ var listCarros = []; //Aqui estaran todos los diccionarios Carro
 
 var contadorMovimientos = 0;
 var movimientosDiv = document.getElementById("movimientos");
+
 //Ejemplo Coordenadas: [0,1]
 /**
- * 
+ * Busca un carro en la lista de carros mediante sus coordenadas
  * @param {[int, int]} coordenadas 
  * @returns carro o -1 en caso de que no haya carro en la posicion
  */
@@ -95,7 +96,7 @@ function dfs(carro, [y, x], index = 0, acciones = "") {
 }
 
 /**
- * 
+ * Busca un carro en la listCarros mediante su id
  * @param {int} id 
  * @returns carrro  o -1 si no hay carro con el id
  */
@@ -110,7 +111,7 @@ function buscarCarroById(id) {
 }
 
 /**
- * Returns the minimum of 2 values
+ * Retorna el número menor de dos números dados
  * @param {number} a
  * @param {number} b
  * @returns {number}
