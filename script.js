@@ -223,8 +223,9 @@ function initGUI() {
                 dicCarro['orientacion'] = 'h';
                 dicCarro['heuristica'] = 0;
                 dicCarro['costoInicial'] = 0;
-                dicCarro['costoTotal'] = 0;
+                dicCarro['costoTotal'] = dicCarro.costoInicial + dicCarro.heuristica;
                 dicCarro['esObjetivo'] = isTarget;
+                dicCarro['direccion'] = "";
                 dicCarro['padre'] = null;
                 //console.log(dicCarro);
                 listCarros.push(dicCarro);
@@ -262,8 +263,9 @@ function initGUI() {
                     dicCarro['orientacion'] = 'v';  //Se guarda la orientación del carro
                     dicCarro['heuristica'] = 0;
                     dicCarro['costoInicial'] = 0;
-                    dicCarro['costoTotal'] = 0;
+                    dicCarro['costoTotal'] = dicCarro.costoInicial + dicCarro.heuristica;
                     dicCarro['esObjetivo'] = isTarget;  //Se guarda si el carro es objetivo
+                    dicCarro['direccion'] = "";
                     dicCarro['padre'] = null;
                     //console.log(dicCarro);
                     listCarros.push(dicCarro);
@@ -435,7 +437,7 @@ function parseBoard() {
     //console.log(tablero);
     generarTablero();
     initGUI();
-    console.log(aEstrella(tablero, [4,5], [4,6]));
+    console.log(aEstrella([4,6]));
 };
 
 // Función para permitir que los elementos se puedan arrastrar
@@ -454,38 +456,139 @@ function drag(event) {
  *  Funcion que retorna el carro objetivo
  * @returns El diccionario con el carro objetivo
  */
-function obtenerCarroObjetivo(){
+function obtenerCarroObjetivo(objetivo, id){
     for (let i = 0; i < listCarros.length; i++) {
-        if(listCarros[i].esObjetivo == true){
+        if(listCarros[i].esObjetivo == true && objetivo == true){
             return listCarros[i];
 
         }
-        
+        else if(listCarros[i].esObjetivo == false && id == listCarros[i].id){
+            return listCarros[i];
+        }
     }
-
-
 }
 
-function actualizarPosiciones(carro, fila, columna){
+function actualizarPosiciones(carro, movimiento, matriz){ // mov que es de tipo [x,y]
     for(let i = 0; i < carro.posiciones.length; i++){
-        carro.posiciones[i][1] += 1;
+        carro.posiciones[i][0] += movimiento[0];
+        carro.posiciones[i][1] += movimiento[1];
     }
-
 }
-
 
 /**
- * 
+ * Esta funcion me hizo llorar 3 veces y perder pelo a la hora de calcular con los autos que bloquean
  * @param {Carro} nodo que es el carro 
  * @param {Coordenadas x,y} destino, posicion de la ubicacion del destinon
  * @returns El camino utilizando la distancia Manhattan (Solo toma 
  */
-function calcularHeuristica(node, destino) {
+function calcularHeuristica(node, destino, posicion) {
     //                   x                 
     
-    if(node.esObjetivo == true){
-        return Math.abs(node.posiciones[3][0] - destino[0]) + Math.abs(node.posiciones[3][1] - destino[1]);
+   // if(node.esObjetivo == true){ // para el objetivo cada vez tratara de acercarse 
+        let smoke = Math.abs(node.posiciones[posicion][0] - destino[0]) + Math.abs(node.posiciones[posicion][1] - destino[1]);
+    
+       return smoke;
+ //   }
+  //  else{
+ //       if(node.orientacion == 'v'){ 
+          // if(node.posiciones[][] - tablero[0][0]){
+          // }
+     //   }
+
+    //}
+}
+
+
+function cambiarCarro(fila, columna){
+    // busco cual es el carro con las filas, columnas
+    for (let i = 0; i < listCarros.length; i++) {
+        let carro = listCarros[i]; // Obtener el carro en el índice 'i'
+        for (let j = 0; j < carro.posiciones.length; j++) {
+            const pos = carro.posiciones[j]; // Obtener la posición en 'j'
+            // Verificar si la fila y columna dadas están dentro de esta posición
+            if (pos[0] === fila && pos[1] === columna) {
+                nodoActual = carro;
+                return carro;
+            }
+        }
     }
+
+}
+
+function calcularNuevoDestino(nodo, movimiento, destino){
+    if(nodo.esObjetivo != true){ // si el carro no es el objetivo se cambia su destino
+        if (movimiento[0] === -1 && movimiento[1] === 0) {
+            destino = tablero[0][nodo.posiciones[0][1]];
+            return destino;
+        } else if (movimiento[0] === 1 && movimiento[1] === 0) {
+            destino = tablero[tablero.length-1][nodo.posiciones[nodo.posiciones.length-1][1]];
+            return destino;
+        } else if (movimiento[0] === 0 && movimiento[1] === -1) {
+            destino = tablero[nodo.posiciones[0][0]][0];
+            return destino;
+        } else if (movimiento[0] === 0 && movimiento[1] === 1) {
+            destino = tablero[nodo.posiciones[nodo.posiciones.length-1][0]][tablero.length-1];
+            return destino;
+        }
+    }
+    else{
+        destino = [4,6];
+        return destino;
+    }
+
+}
+
+function generarMovimientos(carroActual, matriz, destino, movimientos, sucesores){
+    for(movimiento of movimientos){
+        let fila;
+        let columna;
+        let posicion;
+        if(movimiento[0] == -1 || movimiento[1] == -1){ // si se mueve a la izquierda se toma el carro de la pura izquierda o arriba
+            fila = carroActual.posiciones[0][0] + movimiento[0];
+            columna = carroActual.posiciones[0][1] + movimiento[1]
+            posicion = 0;
+        }else if(movimiento[0] == 1 || movimiento[1] == 1){ // si se mueve derecha
+            fila = carroActual.posiciones[carroActual.posiciones.length - 1][0] + movimiento[0];
+            columna = carroActual.posiciones[carroActual.posiciones.length - 1][1] + movimiento[1];
+            posicion = carroActual.posiciones.length-1;
+        }
+
+        // Verificar si no se sale de la matriz
+        if (fila >= 0 && columna >= 0 && fila < matriz.length && columna < matriz[0].length) {
+            // verificar si en el movimiento se encuetra vacio o si se encuentra un carro bloqueado
+            if(matriz[fila][columna] == "."){ // recordar que en las posiciones estan en forma x,y, si existe un carro bloqueandolo
+                const nuevoCarro = JSON.parse(JSON.stringify(carroActual)); // para crear una copia completamente nueva
+                nuevoCarro.costoInicial = carroActual.costoInicial + 1; // Costo de movimiento, los costos son de 1
+                const nuevoDestino = calcularNuevoDestino(carroActual, movimiento, destino);
+                nuevoCarro.heuristica = calcularHeuristica(nuevoCarro, nuevoDestino, posicion);
+                nuevoCarro.costoTotal = nuevoCarro.costoInicial + nuevoCarro.heuristica
+                actualizarPosiciones(nuevoCarro, movimiento, matriz);
+                sucesores.push(nuevoCarro);
+      
+            }
+            else if(matriz[fila][columna] == "|"){
+                carroActual = cambiarCarro(fila, columna); // se cambia el carro
+                const nuevoCarro = JSON.parse(JSON.stringify(carroActual)); // para crear una copia completamente nueva
+                nuevoCarro.costoInicial = carroActual.costoInicial + 1; // Costo de movimiento, los costos son de 1
+                nuevoCarro.costoTotal = nuevoCarro.costoInicial
+                const nuevoDestino = calcularNuevoDestino(carroActual, movimiento, destino);
+                nuevoCarro.heuristica = calcularHeuristica(nuevoCarro, nuevoDestino, posicion);
+                nuevoCarro.costoTotal = nuevoCarro.costoInicial + nuevoCarro.heuristica
+                sucesores.push(nuevoCarro);
+            }
+            else if(matriz[fila][columna] == "-"){
+                carroActual = cambiarCarro(fila, columna); // se cambia el carro
+                const nuevoCarro = JSON.parse(JSON.stringify(carroActual)); // para crear una copia completamente nueva
+                nuevoCarro.costoInicial = carroActual.costoInicial + 1; // Costo de movimiento, los costos son de 1
+                const nuevoDestino = calcularNuevoDestino(carroActual, movimiento, destino);
+                nuevoCarro.heuristica = calcularHeuristica(nuevoCarro, nuevoDestino, posicion);
+                nuevoCarro.costoTotal = nuevoCarro.costoInicial + nuevoCarro.heuristica
+                sucesores.push(nuevoCarro);
+            }
+        }
+    }
+    return sucesores;
+
 }
 
 /**
@@ -496,70 +599,19 @@ function calcularHeuristica(node, destino) {
  * @returns Array de todos los carros adyacentes
  */
 function generarEstados(carroActual, matriz, destino) {
-    const sucesores = [];
-    const movimientoVertical = [[-1, 0], [1, 0],]; // Movimientos posibles: arriba, izquierda, abajo, derecha depende de la variable 
-    const movimientoHorizontal = [[0, -1], [0, 1]];
+    const sucesores = []; // lista con todos los posibles estados
+    const movimientoVertical = [[-1, 0], [1, 0],]; // Movimientos posibles: arriba, abajo
+    const movimientoHorizontal = [[0, -1], [0, 1]]; // izquierda, derecha
 
     if (carroActual.orientacion == 'h'){
-        for (const movimiento of movimientoHorizontal) {
-            // se mueven en base al ultimo cuadro para llegar
-            const fila = carroActual.posiciones[3][0] + movimiento[0];
-            const columna = carroActual.posiciones[3][1] + movimiento[1];
-    
-            // Verificar si no se sale de la matriz
-            if (fila >= 0 && columna >= 0 && fila < matriz.length && columna < matriz[0].length) {
-                // verificar si en el movimiento se encuetra vacio o si se encuentra un carro bloqueado
-                //for(const carro of listCarros){
-                   // for(pos of carro.posiciones){
-                        if(matriz[fila][columna] == "."){ // recordar que en las posiciones estan en forma x,y, si existe un carro bloqueandolo
-                            const nuevoCarro = JSON.parse(JSON.stringify(carroActual)); // para crear una copia completamente nueva
-                            nuevoCarro.costoInicial = carroActual.costoInicial + 1; // Costo de movimiento, los costos son de 1
-                            nuevoCarro.heuristica = calcularHeuristica(nuevoCarro, destino);
-                            actualizarPosiciones(nuevoCarro, fila, columna);
-                            sucesores.push(nuevoCarro);
-
-                        }
-                    //}
-               // }
-/*
-                if (matriz[fila][columna] !== "B") { // Ojo aqui tengo a B como obstaculo en la matriz. CAMBIAR DE SER NECESARIO
-                    let nuevoCarro = carroActual;
-                    nuevoCarro.costoInicial = carroActual.costoInicial + 1; // Costo de movimiento, los costos son de 1
-                    nuevoCarro.heuristica = calcularHeuristica(nuevoCarro, destino);
-                    actualizarPosiciones(nuevoCarro, fila, columna);
-                    sucesores.push(nuevoCarro);
-                }
-                */
-            }
-        }
+        return generarMovimientos(carroActual, matriz, destino, movimientoHorizontal, sucesores)
     }
 
     else if(carroActual.orientacion == 'v'){
-        for (const movimiento of movimientoVertical) {
-            const fila = carroActual.posiciones[3][0] + movimiento[0];
-            const columna = carroActual.posiciones[3][1] + movimiento[1];
-
-            // Verificar si el sucesor está dentro de los límites de la matriz
-            if (fila >= 0 && columna >= 0 && fila < matriz.length && columna < matriz[0].length) {
-                // Verificar si el sucesor es un espacio válido
-                if (matriz[fila][columna] !== "B") { // Ojo aqui tengo a B como obstaculo en la matriz. CAMBIAR DE SER NECESARIO
-                    const nuevoCarro = carroActual;
-                    nuevoCarro.costoInicial = carroActual.costoInicial + 1; // Costo de movimiento, los costos son de 1
-                    nuevoCarro.heuristica = calcularHeuristica(nuevoCarro, destino);
-                    sucesores.push(
-                        nuevoCarro
-
-                    );
-                }
-                else if(matriz[fila][columna] == '|'){
-
-
-                }
-            }
-        }
+        return generarMovimientos(carroActual, matriz, destino, movimientoVertical, sucesores)
     }
 
-    return sucesores;
+   // return sucesores;
 }
 
 /**
@@ -570,7 +622,7 @@ function generarEstados(carroActual, matriz, destino) {
  * @returns true si encontro la solucion, false sino
  */
 function esSolucion(nodoActual, destino, camino){
-    if (nodoActual.posiciones[3][0] === destino[0] && nodoActual.posiciones[3][1] === destino[1]) {
+    if (nodoActual.posiciones[nodoActual.posiciones.length-1][0] === destino[0] && nodoActual.posiciones[nodoActual.posiciones.length-1][1] === destino[1]) {
         let nodo = nodoActual;
         while (nodo) {
             camino.push([nodo.posiciones[3][0], nodo.posiciones[3][1]]);
@@ -588,23 +640,22 @@ function esSolucion(nodoActual, destino, camino){
  * @param {Salida} destino 
  * @returns El camino a seguir
  */
-function aEstrella(matriz, inicio, destino) {
-    const abierto = []; 
-    const cerrado = []; // Nodos que ya hemos visitado por cada llamada 
-
+function aEstrella(destino) {
+    const abierto = []; // Nodos que estamos actualmente
+    const cerrado = []; // Nodos que ya hemos visitado 
+    const matriz = JSON.parse(JSON.stringify(tablero));
     
-    const carroObjetivo = obtenerCarroObjetivo(); // en un inicio siempre se movera el carro rojo de primero
-    carroObjetivo.calcularHeuristica = calcularHeuristica(carroObjetivo, destino);
+    const carroObjetivo = obtenerCarroObjetivo(true, 0); // en un inicio siempre se movera el carro rojo de primero
+    carroObjetivo.calcularHeuristica = calcularHeuristica(carroObjetivo, destino, 3);
     carroObjetivo.costoInicial = 0;
     abierto.push(
         carroObjetivo
     );
-
     while (abierto.length > 0) {
         let carroActual = abierto[0]; // Es el estado del carro actual
         let indiceActual = 0;
 
-        // Encontrar el nodo con el valor f mínimo en el conjunto abierto
+        // Encontrar el carro con el costo minimo de abierto
         for (let i = 1; i < abierto.length; i++) {
             if (abierto[i].costoTotal < carroActual.costoTotal) {
                 carroActual = abierto[i];
@@ -628,12 +679,12 @@ function aEstrella(matriz, inicio, destino) {
 
         for (const sucesor of sucesores) {
             // Verificar si el sucesor está en el conjunto cerrado
-            if (cerrado.find(n => n.posiciones[3][0] === sucesor.posiciones[3][0] && n.posiciones[3][1] === sucesor.posiciones[3][1])) {
+            if (cerrado.find(n => n.posiciones[n.posiciones.length-1][0] === sucesor.posiciones[sucesor.posiciones.length-1][0] && n.posiciones[n.posiciones.length-1][1] === sucesor.posiciones[sucesor.posiciones.length-1][1])) {
                 continue;
             }
 
             // Verificar si el sucesor está en el conjunto abierto y tiene un valor f menor
-            const nodoAbierto = abierto.find(n => n.posiciones[3][0] === sucesor.posiciones[3][0] && n.posiciones[3][1] === sucesor.posiciones[3][0]);
+            const nodoAbierto = abierto.find(n => n.posiciones[n.posiciones.length-1][0] === sucesor.posiciones[sucesor.posiciones.length-1][0] && n.posiciones[n.posiciones.length-1][1] === sucesor.posiciones[sucesor.posiciones.length-1][0]);
             if (nodoAbierto && sucesor.costoTotal >= nodoAbierto.costoTotal) {
                 continue;
             }
@@ -642,9 +693,9 @@ function aEstrella(matriz, inicio, destino) {
             sucesor.padre = carroActual;
 
             // Agregar el sucesor al conjunto abierto si no está allí
-            if (!nodoAbierto) {
+           // if (!nodoAbierto) {
                 abierto.push(sucesor);
-            }
+            //}
         }
     }
 
