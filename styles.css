@@ -23,6 +23,11 @@
     flex-direction: column;
 }
 
+#tiempo-ejecucion,
+#movimientos {
+    margin-right: 10px;
+}
+
 .tablero2{
     display: flex;
     flex-direction: column;
