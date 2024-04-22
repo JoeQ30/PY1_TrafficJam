@@ -139,10 +139,12 @@ function validarMovimiento(celda, direccion) {
 }
 
 /**
- * 
+ * Para mover hacia la derecha en caso 'h' o hacia abajo en caso 'v'
+ * moverCarroAdelante(carro['posiciones'][0])
+ * [0,0]
  * @param {[int, int]} coordenadas 
  */
-function moverCarro(coordenadas) {
+function moverCarroAdelante(coordenadas) {
     var carro = buscarCarroByCoordsDFS(coordenadas); //Se obtiene el carro que se encuentra en las coordenadas
     if (carro != null) {
         var posicionesCarro = carro['posiciones'];  //Se obtiene la lista de celdas que componen al carro
@@ -163,6 +165,44 @@ function moverCarro(coordenadas) {
                     let currentPosition = posicionesCarro[i];           //Se recorren todas las posiciones de la lista de coordenadas
                     if (currentPosition[0] < filas - 1)
                         currentPosition[0] += 1;                        //Si es válido se le suma 1 a la fila a cada posición de la lista
+                }
+            };
+        }
+        //Actualizar la posicion
+        updateCars();                   //Se colocan todos los carros en una nueva matriz
+        updateGUI();                    //Se actualiza la GUI con la nueva matriz
+        contadorMovimientos +=1;        //Se aumenta el contador de movimientos
+        movimientosDiv.innerHTML = "Movimientos: " + contadorMovimientos;
+    } else {
+        console.error("No hay ningún carro en esta posicion")
+    }
+}
+
+/**
+ * Para mover el carro hacia la izquierda en caso 'h' o hacia arriba en caso 'v'
+ * @param {[int, int]} coordenadas 
+ */
+function moverCarroAtras(coordenadas) {
+    var carro = buscarCarroByCoordsDFS(coordenadas); //Se obtiene el carro que se encuentra en las coordenadas
+    if (carro != null) {
+        var posicionesCarro = carro['posiciones'];  //Se obtiene la lista de celdas que componen al carro
+        var orientacion = carro['orientacion'];     //Se obtiene la orientacion del carro
+        if (orientacion === 'h') {
+            let head = posicionesCarro[posicionesCarro.length - 1];  //Se obtiene la cabeza del carro
+            if (validarMovimiento(head, 'h')) {
+                for (let i = 0; i < posicionesCarro.length; i++) {
+                    let currentPosition = posicionesCarro[i];       //Se recorren todas las posiciones de la lista de coordenadas
+                    if (currentPosition[1] < columnas - 1)
+                        currentPosition[1] -= 1;                    //Si es válido se le suma 1 a la columna a cada posición de la lista
+                }
+            };
+        } else {
+            let head = posicionesCarro[posicionesCarro.length - 1];     //Se obtiene la cabeza del carro
+            if (validarMovimiento(head, 'v')) {
+                for (let i = 0; i < posicionesCarro.length; i++) {      
+                    let currentPosition = posicionesCarro[i];           //Se recorren todas las posiciones de la lista de coordenadas
+                    if (currentPosition[0] < filas - 1)
+                        currentPosition[0] -= 1;                        //Si es válido se le suma 1 a la fila a cada posición de la lista
                 }
             };
         }
@@ -446,12 +486,14 @@ function generarTablero() {
             // Si la celda es la salida, agrega la clase "exit"; de lo contrario, agrega la clase "celda"
             celda.classList.add((i == indexOut_y - 1 && j == indexOut_x - 1) ? "exit" : "celda");
             celda.id = `C${i}${j}`; // Asigna un ID único a la celda basado en su posición
-            // Asigna un evento de clic a la celda para llamar a la función moverCarro con las coordenadas de la celda
+
+            // Agrega un evento de clic a la celda
             (function(x, y) {
                 celda.addEventListener("click", function() {
-                    moverCarro([x, y]);
+                    moverCarroAdelante([x, y]);
                 });
-            })(i, j); // Utiliza una función de cierre para crear un ámbito diferente para cada par de coordenadas
+            })(i, j); // Utiliza una función de cierre para crear un ámbito diferente para cada variable coords
+           
 
             fila.appendChild(celda); // Agrega la celda a la fila
         }
