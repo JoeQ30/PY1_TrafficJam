@@ -646,6 +646,117 @@ function calcularHeuristica(node, destino, posicion) {
     //}
 }
 
+function vaciarTableroActual(tablero){
+        tablero = []; // Reinicia el tablero vaciándolo completamente
+        // Itera sobre cada fila del tablero
+        for (var i = 0; i < filas; i++) {
+            var fila = [];
+            // Itera sobre cada columna de la fila actual
+            for (var j = 0; j < columnas; j++) {
+                fila.push('.'); // Rellena la celda con un punto ('.')
+            }
+            tablero.push(fila); // Agrega la fila al tablero
+        }
+
+}
+
+
+function updateCars1(tablero){
+    vaciarTableroActual(tablero);
+    for (var i = 0; i < listCarros.length; i++) {
+        var carro = listCarros[i];
+        // Itera sobre cada posición del carro
+        for (var j = 0; j < carro.posiciones.length; j++) {
+            var pos = carro['posiciones'][j];
+            // Verifica la orientación del carro
+            if (carro['orientacion'] === 'h') {
+                // Si la posición es la última del carro
+                if (pos === carro['posiciones'][carro['posiciones'].length - 1]) {
+                    // Si el carro es objetivo, actualiza la posición con 'B', de lo contrario '>'
+                    tablero[pos[0]][pos[1]] = carro['esObjetivo'] ? 'B' : '>';
+                } else {
+                    // Si no es la última posición, actualiza con '-'
+                    tablero[pos[0]][pos[1]] = '-';
+                }
+            } else {
+                // Si la posición es la última del carro
+                if (pos === carro['posiciones'][carro['posiciones'].length - 1]) {
+                    // Si el carro es objetivo, actualiza la posición con 'B', de lo contrario 'v'
+                    tablero[pos[0]][pos[1]] = carro['esObjetivo'] ? 'B' : 'v';
+                } else {
+                    // Si no es la última posición, actualiza con '|'
+                    tablero[pos[0]][pos[1]] = '|';
+                }
+            }
+        }
+    }
+
+
+}
+
+function moverCarroAtrasAlgoritmo(coordenadas, matriz){
+    var carro = buscarCarroByCoordsDFS(coordenadas); //Se obtiene el carro que se encuentra en las coordenadas
+    if (carro != null) {
+        var posicionesCarro = carro['posiciones'];  //Se obtiene la lista de celdas que componen al carro
+        var orientacion = carro['orientacion'];     //Se obtiene la orientacion del carro
+        if (orientacion === 'h') {
+            let head = posicionesCarro[posicionesCarro.length - 1];  //Se obtiene la cabeza del carro
+            if (validarMovimiento(head, 'h')) {
+                for (let i = 0; i < posicionesCarro.length; i++) {
+                    let currentPosition = posicionesCarro[i];       //Se recorren todas las posiciones de la lista de coordenadas
+                    if (currentPosition[1] < columnas - 1)
+                        currentPosition[1] -= 1;                    //Si es válido se le suma 1 a la columna a cada posición de la lista
+                }
+            };
+        } else {
+            let head = posicionesCarro[posicionesCarro.length - 1];     //Se obtiene la cabeza del carro
+            if (validarMovimiento(head, 'v')) {
+                for (let i = 0; i < posicionesCarro.length; i++) {      
+                    let currentPosition = posicionesCarro[i];           //Se recorren todas las posiciones de la lista de coordenadas
+                    if (currentPosition[0] < filas - 1)
+                        currentPosition[0] -= 1;                        //Si es válido se le suma 1 a la fila a cada posición de la lista
+                }
+            };
+        }
+        //Actualizar la posicion
+        updateCars1(matriz);                   //Se colocan todos los carros en una nueva matriz
+    } else {
+        console.error("No hay ningún carro en esta posicion")
+    }
+}
+
+function moverCarroAdelanteAlgoritmo(coordenadas, matriz){
+    var carro = buscarCarroByCoordsDFS(coordenadas);
+    if (carro != null) {
+        var posicionesCarro = carro['posiciones'];  //Se obtiene la lista de celdas que componen al carro
+        var orientacion = carro['orientacion'];     //Se obtiene la orientacion del carro
+        if (orientacion === 'h') {
+            let head = posicionesCarro[posicionesCarro.length - 1];  //Se obtiene la cabeza del carro
+            if (validarMovimiento(head, 'h')) {
+                for (let i = 0; i < posicionesCarro.length; i++) {
+                    let currentPosition = posicionesCarro[i];       //Se recorren todas las posiciones de la lista de coordenadas
+                    if (currentPosition[1] < columnas - 1)
+                        currentPosition[1] += 1;                    //Si es válido se le suma 1 a la columna a cada posición de la lista
+                }
+            };
+        } else {
+            let head = posicionesCarro[posicionesCarro.length - 1];     //Se obtiene la cabeza del carro
+            if (validarMovimiento(head, 'v')) {
+                for (let i = 0; i < posicionesCarro.length; i++) {      
+                    let currentPosition = posicionesCarro[i];           //Se recorren todas las posiciones de la lista de coordenadas
+                    if (currentPosition[0] < filas - 1)
+                        currentPosition[0] += 1;                        //Si es válido se le suma 1 a la fila a cada posición de la lista
+                }
+            };
+        }
+        //Actualizar la posicion
+        updateCars1(matriz);                   //Se colocan todos los carros en una nueva matriz
+    } else {
+        console.error("No hay ningún carro en esta posicion")
+    }
+}
+
+
 
 function cambiarCarro(fila, columna){
     // busco cual es el carro con las filas, columnas
@@ -691,14 +802,20 @@ function generarMovimientos(carroActual, matriz, destino, movimientos, sucesores
         let fila;
         let columna;
         let posicion;
+        let nuevoTablero;
         if(movimiento[0] == -1 || movimiento[1] == -1){ // si se mueve a la izquierda se toma el carro de la pura izquierda o arriba
             fila = carroActual.posiciones[0][0] + movimiento[0];
             columna = carroActual.posiciones[0][1] + movimiento[1]
             posicion = 0;
+            nuevoTablero= JSON.parse(JSON.stringify(matriz)); // para crear una copia completamente nueva
+            moverCarroAtrasAlgoritmo(carroActual.posiciones[0][0], nuevoTablero);
+
         }else if(movimiento[0] == 1 || movimiento[1] == 1){ // si se mueve derecha
             fila = carroActual.posiciones[carroActual.posiciones.length - 1][0] + movimiento[0];
             columna = carroActual.posiciones[carroActual.posiciones.length - 1][1] + movimiento[1];
             posicion = carroActual.posiciones.length-1;
+            nuevoTablero= JSON.parse(JSON.stringify(matriz)); // para crear una copia completamente nueva
+            moverCarroAdelanteAlgoritmo(carroActual.posiciones[0][0], nuevoTablero);
         }
 
         // Verificar si no se sale de la matriz
